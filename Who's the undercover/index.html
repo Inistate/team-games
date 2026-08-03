@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Who's the Undercover - Word Dealer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --brand: #2b9ec6;
+      --brand-600: #237f9f;
+      --brand-50: #eaf7fb;
+      --surface-app: #f2f5f7;
+      --surface-primary: #ffffff;
+      --surface-secondary: #f8fafb;
+      --text-primary: #1d2939;
+      --text-secondary: #667085;
+      --text-tertiary: #98a2b3;
+      --border-default: #e4e7ec;
+      --border-strong: #d0d5dd;
+      --green-50: #ecfdf3;
+      --green-700: #067647;
+      --red-50: #fef3f2;
+      --red-700: #b42318;
+      --blue-50: #eff8ff;
+      --blue-700: #175cd3;
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+      --shadow-md: 0 12px 20px -8px rgba(16, 24, 40, 0.18);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background: var(--surface-app);
+      color: var(--text-primary);
+      font-family: Roboto, "Segoe UI", Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    button, input, select { font: inherit; }
+    h1, h2, h3, p { margin: 0; }
+
+    .app-header {
+      min-height: 64px;
+      border-bottom: 1px solid var(--border-default);
+      background: var(--surface-primary);
+    }
+
+    .header-inner {
+      width: min(1280px, calc(100% - 48px));
+      min-height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      display: block;
+      width: 140px;
+      height: auto;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+
+    .brand-divider {
+      width: 1px;
+      height: 26px;
+      background: var(--border-default);
+      flex: 0 0 auto;
+    }
+
+    .workspace-name {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .header-context {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #12b76a;
+    }
+
+    main {
+      width: min(1280px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow, .small-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 16px;
+    }
+
+    .eyebrow { margin-bottom: 4px; }
+
+    h1 {
+      color: var(--text-primary);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 36px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      max-width: 680px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .page-meta {
+      color: var(--text-secondary);
+      font-size: 13px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .page-footer {
+      width: min(1280px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 20px 0 28px;
+      border-top: 1px solid var(--border-default);
+      color: var(--text-tertiary);
+      font-size: 12px;
+      line-height: 16px;
+      text-align: right;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel, .status, .player-workspace {
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background: var(--surface-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .panel-heading h2, .workspace-heading h2 {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 700;
+    }
+
+    .panel-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 18px;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 40px;
+      margin-top: 6px;
+      padding: 8px 12px;
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--surface-primary);
+      color: var(--text-primary);
+      line-height: 20px;
+      outline: 0;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    select {
+      appearance: auto;
+      padding-right: 8px;
+    }
+
+    input:hover, select:hover { border-color: #98a2b3; }
+
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(43, 158, 198, 0.2);
+      outline-offset: 1px;
+      border-color: var(--brand);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button {
+      min-height: 40px;
+      border: 1px solid var(--brand);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      color: #fff;
+      background: var(--brand);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:hover { background: var(--brand-600); border-color: var(--brand-600); }
+    button:active { background: #186781; border-color: #186781; }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+    button:disabled:hover { background: var(--brand); border-color: var(--brand); }
+
+    .secondary {
+      border-color: var(--border-strong);
+      background: var(--surface-primary);
+      color: #344054;
+    }
+
+    .secondary:hover { border-color: #98a2b3; background: #f9fafb; }
+    .secondary:active { background: #f2f4f7; }
+    .secondary:disabled:hover { border-color: var(--border-strong); background: var(--surface-primary); }
+
+    .danger { background: #d92d20; border-color: #d92d20; }
+    .danger:hover { background: #b42318; border-color: #b42318; }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .actions button { white-space: nowrap; }
+
+    .hint {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 18px;
+      text-align: justify;
+    }
+
+    .locked-setup {
+      display: none;
+      padding: 14px;
+      border: 1px solid #b9e6f3;
+      border-radius: var(--radius-md);
+      background: var(--brand-50);
+    }
+
+    .locked-setup.active { display: block; }
+
+    .lock-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #0f5870;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 20px;
+    }
+
+    .lock-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--brand);
+    }
+
+    .locked-setup .subtitle { margin-top: 6px; font-size: 13px; }
+
+    .host-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .host-tools button:last-child { grid-column: 1 / -1; }
+
+    .history-line {
+      margin-top: 12px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .answer-key {
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background: var(--surface-primary);
+    }
+
+    .answer-key[hidden] { display: none; }
+
+    .answer-summary {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-default);
+      color: #344054;
+      background: #f8fafc;
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border-default); text-align: left; }
+    th { color: var(--text-secondary); background: var(--surface-secondary); font-weight: 500; }
+    tr:last-child td { border-bottom: 0; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 16px;
+      white-space: nowrap;
+    }
+
+    .badge.normal { color: var(--blue-700); background: var(--blue-50); }
+    .badge.undercover { color: var(--red-700); background: var(--red-50); }
+
+    .game-area {
+      display: grid;
+      min-width: 0;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+    }
+
+    .status-content { display: grid; gap: 2px; }
+    .status strong { color: var(--text-primary); font-size: 14px; line-height: 20px; }
+    .status span { color: var(--text-secondary); font-size: 13px; line-height: 18px; }
+    .status .secondary { flex: 0 0 auto; }
+
+    .player-workspace { height: 100%; overflow: hidden; }
+
+    .workspace-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .workspace-heading p { margin-top: 2px; color: var(--text-secondary); font-size: 13px; line-height: 18px; }
+
+    .player-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .player-card {
+      min-height: 116px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background: var(--surface-primary);
+      color: var(--text-primary);
+      text-align: left;
+      box-shadow: none;
+    }
+
+    .player-card:hover {
+      border-color: var(--brand);
+      background: #fbfeff;
+      box-shadow: 0 0 0 3px rgba(43, 158, 198, 0.1);
+    }
+
+    .player-card.done { border-color: #ccefdc; background: #f6fef9; }
+    .player-card.done:hover { border-color: #8ed7ae; box-shadow: 0 0 0 3px rgba(18, 183, 106, 0.1); }
+    .player-card .small-label { color: var(--text-secondary); }
+    .player-card.done .small-label { color: var(--green-700); }
+
+    .player-number { color: var(--text-primary); font-size: 20px; font-weight: 700; line-height: 28px; }
+
+    .reveal-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      place-items: center;
+      padding: 24px;
+      background: rgba(16, 24, 40, 0.68);
+    }
+
+    .reveal-screen.active { display: grid; }
+
+    .reveal-box {
+      width: min(560px, 100%);
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background: var(--surface-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .reveal-box::before {
+      content: "Private player view";
+      display: block;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      background: var(--surface-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 16px;
+      text-align: left;
+    }
+
+    .cover, #wordPanel { margin: 20px; }
+
+    .cover {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      padding: 28px;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-md);
+      background: var(--surface-secondary);
+      text-align: center;
+    }
+
+    .cover .small-label, #wordPanel .small-label { color: var(--brand-600); }
+    .cover p:last-child { max-width: 360px; margin-top: 8px; color: var(--text-secondary); font-size: 14px; line-height: 20px; }
+
+    #wordPanel { text-align: center; }
+
+    .secret-word {
+      display: grid;
+      min-height: 144px;
+      place-items: center;
+      margin-top: 12px;
+      padding: 20px;
+      border: 1px solid #b9e6f3;
+      border-radius: var(--radius-md);
+      background: var(--brand-50);
+      color: #0f5870;
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 56px;
+      overflow-wrap: anywhere;
+    }
+
+    .reveal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 20px 20px;
+    }
+
+    .toast {
+      min-height: 18px;
+      margin-top: 12px;
+      color: var(--red-700);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+    }
+
+    @media (max-width: 980px) {
+      .player-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .header-inner, main { width: min(100% - 32px, 1280px); }
+      .header-context, .brand-divider, .workspace-name { display: none; }
+      main { padding: 24px 0 32px; }
+      .page-heading { display: block; margin-bottom: 16px; }
+      .page-meta { margin-top: 8px; text-align: left; white-space: normal; }
+      .page-footer { width: min(100% - 32px, 1280px); text-align: left; }
+      .layout { grid-template-columns: 1fr; gap: 16px; }
+      .player-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 16px; }
+      .status { align-items: stretch; flex-direction: column; }
+      .status .secondary { width: 100%; }
+      .secret-word { font-size: 36px; line-height: 44px; }
+    }
+
+    @media (max-width: 420px) {
+      .actions, .host-tools, .row, .reveal-actions { grid-template-columns: 1fr; }
+      .host-tools button:last-child { grid-column: auto; }
+      .player-grid { grid-template-columns: 1fr; }
+      .reveal-screen { padding: 12px; }
+      .cover, #wordPanel { margin: 16px; }
+      .reveal-actions { padding: 0 16px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <img class="logo" src="logo.png" alt="Inistate">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="workspace-name">Team activities</span>
+      </div>
+      <p class="header-context"><span class="status-dot" aria-hidden="true"></span>Friday activity</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-heading" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">31 July 2026 &middot; Open area</p>
+        <h1 id="pageTitle">Who's the Undercover</h1>
+        <p class="subtitle">Deal private words, reveal them one player at a time, and keep the answer key available only to the host.</p>
+      </div>
+      <p class="page-meta">PIC: Louis</p>
+    </section>
+
+    <section class="layout">
+      <aside class="panel" aria-label="Game setup">
+        <div class="panel-heading">
+          <h2>Round setup</h2>
+          <span class="small-label">Host only</span>
+        </div>
+        <div class="panel-body">
+          <div id="hostFields">
+          <label>
+            Normal word
+            <input id="normalWord" value="Coffee" autocomplete="off">
+          </label>
+          <label>
+            Undercover word
+            <input id="secretWord" value="Tea" autocomplete="off">
+          </label>
+          <div class="row">
+            <label>
+              Players
+              <select id="playerCount">
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option selected>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>13</option>
+                <option>14</option>
+                <option>15</option>
+                <option>16</option>
+                <option>17</option>
+                <option>18</option>
+              </select>
+            </label>
+            <label>
+              Undercover
+              <select id="undercoverCount">
+                <option selected>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+            </label>
+          </div>
+        </div>
+          <div id="lockedSetup" class="locked-setup" aria-live="polite">
+          <p class="lock-title"><span class="lock-icon" aria-hidden="true"></span>Setup hidden</p>
+          <p class="subtitle">Words are locked for this round. Pass the screen to players using the cards on the right.</p>
+          <div class="host-tools">
+            <button id="showKeyBtn" class="secondary" type="button">Show answer key</button>
+            <button id="hideKeyBtn" class="secondary" type="button">Hide key</button>
+            <button id="resetHistoryBtn" class="secondary" type="button">Reset used pairs</button>
+          </div>
+          <p id="pairProgress" class="history-line"></p>
+          <div id="answerKey" class="answer-key" hidden>
+            <p id="answerSummary" class="answer-summary"></p>
+            <table aria-label="Host answer key">
+              <thead>
+                <tr>
+                  <th>Player</th>
+                  <th>Role</th>
+                  <th>Word</th>
+                </tr>
+              </thead>
+              <tbody id="answerKeyBody"></tbody>
+            </table>
+          </div>
+        </div>
+          <div class="actions">
+          <button id="startBtn" type="button">Shuffle round</button>
+          <button id="editSetupBtn" class="secondary" type="button">Edit setup</button>
+          </div>
+          <p class="hint">Use one device per group, or let each temporary leader manage their own group. Open the host answer key only when needed.</p>
+          <p id="setupError" class="toast" role="status" aria-live="polite"></p>
+        </div>
+      </aside>
+
+      <section class="game-area" aria-label="Player cards">
+        <div class="status">
+          <div class="status-content">
+            <strong id="roundStatus">Ready</strong>
+            <span id="roundText">Set words and shuffle the first round.</span>
+          </div>
+          <button id="nextRoundBtn" class="secondary" type="button">Random pair</button>
+        </div>
+        <section class="player-workspace" aria-label="Player hand-off">
+          <div class="workspace-heading">
+            <div>
+              <h2>Player hand-off</h2>
+              <p>Select a player, reveal their word privately, then hide it before passing the device.</p>
+            </div>
+            <span class="small-label">Private reveal</span>
+          </div>
+          <div id="playerGrid" class="player-grid"></div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <footer class="page-footer">Designed by Louis Leong</footer>
+
+  <section id="revealScreen" class="reveal-screen" aria-modal="true" role="dialog" aria-label="Private word reveal">
+    <div class="reveal-box">
+      <div id="cover" class="cover">
+        <div>
+          <p class="small-label" id="coverTitle">Player</p>
+          <p>Make sure only this player can see the screen, then reveal the word.</p>
+        </div>
+      </div>
+      <div id="wordPanel" hidden>
+        <p class="small-label" id="playerTitle">Player</p>
+        <div id="shownWord" class="secret-word"></div>
+      </div>
+      <div class="reveal-actions">
+        <button id="revealBtn" type="button">Show Word</button>
+        <button id="doneBtn" class="danger" type="button">Hide word</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const wordPairs = [
+      ["Coffee", "Tea"],
+      ["Beach", "Swimming Pool"],
+      ["Taxi", "Bus"],
+      ["Pizza", "Burger"],
+      ["Doctor", "Nurse"],
+      ["Laptop", "Tablet"],
+      ["Rain", "Snow"],
+      ["Cinema", "Theatre"],
+      ["Cat", "Dog"],
+      ["Pen", "Pencil"],
+      ["Hotel", "Resort"],
+      ["Football", "Basketball"],
+      ["Camera", "Phone"],
+      ["Rice", "Noodles"],
+      ["Moon", "Star"],
+      ["Apple", "Pear"],
+      ["Orange", "Mandarin"],
+      ["Milk", "Yogurt"],
+      ["Bread", "Toast"],
+      ["Cake", "Cupcake"],
+      ["Chocolate", "Candy"],
+      ["Ice Cream", "Gelato"],
+      ["Soup", "Stew"],
+      ["Chicken", "Duck"],
+      ["Beef", "Lamb"],
+      ["Fish", "Prawn"],
+      ["Sushi", "Sashimi"],
+      ["Salad", "Coleslaw"],
+      ["Water", "Juice"],
+      ["Soda", "Sparkling Water"],
+      ["Train", "MRT"],
+      ["Car", "Van"],
+      ["Motorcycle", "Bicycle"],
+      ["Airplane", "Helicopter"],
+      ["Ship", "Boat"],
+      ["Airport", "Bus Station"],
+      ["Road", "Highway"],
+      ["Bridge", "Tunnel"],
+      ["Traffic Light", "Stop Sign"],
+      ["Office", "Meeting Room"],
+      ["Manager", "Supervisor"],
+      ["Teacher", "Lecturer"],
+      ["Student", "Trainee"],
+      ["Police", "Security Guard"],
+      ["Chef", "Baker"],
+      ["Singer", "Dancer"],
+      ["Actor", "Director"],
+      ["Artist", "Designer"],
+      ["Engineer", "Technician"],
+      ["Keyboard", "Mouse"],
+      ["Printer", "Scanner"],
+      ["Monitor", "Television"],
+      ["Charger", "Power Bank"],
+      ["Email", "Message"],
+      ["Website", "App"],
+      ["Password", "PIN"],
+      ["WiFi", "Bluetooth"],
+      ["Cloud", "Server"],
+      ["Spreadsheet", "Document"],
+      ["Chair", "Sofa"],
+      ["Table", "Desk"],
+      ["Bed", "Mattress"],
+      ["Door", "Window"],
+      ["Kitchen", "Pantry"],
+      ["Toilet", "Bathroom"],
+      ["Lift", "Escalator"],
+      ["Clock", "Watch"],
+      ["Bag", "Backpack"],
+      ["Shoes", "Sandals"],
+      ["Shirt", "Jacket"],
+      ["Hat", "Cap"],
+      ["Wallet", "Purse"],
+      ["Umbrella", "Raincoat"],
+      ["Book", "Magazine"],
+      ["Newspaper", "Newsletter"],
+      ["Music", "Podcast"],
+      ["Movie", "Drama"],
+      ["Game", "Puzzle"],
+      ["Chess", "Checkers"],
+      ["Gym", "Stadium"],
+      ["Park", "Garden"],
+      ["Mountain", "Hill"],
+      ["River", "Lake"],
+      ["Ocean", "Sea"],
+      ["Island", "Peninsula"],
+      ["Forest", "Jungle"],
+      ["Desert", "Beach"],
+      ["Sun", "Lamp"],
+      ["Fire", "Candle"],
+      ["Wind", "Fan"],
+      ["Flower", "Plant"],
+      ["Tiger", "Lion"],
+      ["Monkey", "Gorilla"],
+      ["Horse", "Donkey"],
+      ["Rabbit", "Hamster"],
+      ["Shark", "Dolphin"],
+      ["Eagle", "Hawk"],
+      ["Malaysia", "Singapore"],
+      ["Kuala Lumpur", "Putrajaya"],
+      ["Penang", "Melaka"]
+    ];
+
+    const normalWordInput = document.getElementById("normalWord");
+    const secretWordInput = document.getElementById("secretWord");
+    const playerCountInput = document.getElementById("playerCount");
+    const undercoverCountInput = document.getElementById("undercoverCount");
+    const hostFields = document.getElementById("hostFields");
+    const lockedSetup = document.getElementById("lockedSetup");
+    const startBtn = document.getElementById("startBtn");
+    const editSetupBtn = document.getElementById("editSetupBtn");
+    const showKeyBtn = document.getElementById("showKeyBtn");
+    const hideKeyBtn = document.getElementById("hideKeyBtn");
+    const resetHistoryBtn = document.getElementById("resetHistoryBtn");
+    const pairProgress = document.getElementById("pairProgress");
+    const answerKey = document.getElementById("answerKey");
+    const answerSummary = document.getElementById("answerSummary");
+    const answerKeyBody = document.getElementById("answerKeyBody");
+    const nextRoundBtn = document.getElementById("nextRoundBtn");
+    const playerGrid = document.getElementById("playerGrid");
+    const roundStatus = document.getElementById("roundStatus");
+    const roundText = document.getElementById("roundText");
+    const setupError = document.getElementById("setupError");
+    const revealScreen = document.getElementById("revealScreen");
+    const cover = document.getElementById("cover");
+    const coverTitle = document.getElementById("coverTitle");
+    const wordPanel = document.getElementById("wordPanel");
+    const playerTitle = document.getElementById("playerTitle");
+    const shownWord = document.getElementById("shownWord");
+    const revealBtn = document.getElementById("revealBtn");
+    const doneBtn = document.getElementById("doneBtn");
+
+    let assignments = [];
+    let activeIndex = -1;
+    let setupLocked = false;
+    let currentPairKey = "";
+    const usedPairStorageKey = "undercoverUsedPairsV1";
+    let usedPairKeys = loadUsedPairKeys();
+
+    function pairKey(civilian, undercover) {
+      return `${civilian.trim().toLowerCase()}::${undercover.trim().toLowerCase()}`;
+    }
+
+    function loadUsedPairKeys() {
+      try {
+        const saved = window.localStorage.getItem(usedPairStorageKey);
+        const parsed = saved ? JSON.parse(saved) : [];
+        return new Set(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveUsedPairKeys() {
+      window.localStorage.setItem(usedPairStorageKey, JSON.stringify([...usedPairKeys]));
+    }
+
+    function builtInPairKeys() {
+      return wordPairs.map(([civilian, undercover]) => pairKey(civilian, undercover));
+    }
+
+    function usedBuiltInCount() {
+      return builtInPairKeys().filter((key) => usedPairKeys.has(key)).length;
+    }
+
+    function updatePairProgress() {
+      const usedCount = usedBuiltInCount();
+      pairProgress.textContent = `${usedCount} of ${wordPairs.length} built-in pairs used. Random pair will pick an unused pair first.`;
+    }
+
+    function markPairUsed(civilian, undercover) {
+      usedPairKeys.add(pairKey(civilian, undercover));
+      saveUsedPairKeys();
+      updatePairProgress();
+    }
+
+    function shuffle(items) {
+      const result = [...items];
+      for (let index = result.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+      }
+      return result;
+    }
+
+    function clearReveal() {
+      revealScreen.classList.remove("active");
+      wordPanel.hidden = true;
+      cover.hidden = false;
+      shownWord.textContent = "";
+      activeIndex = -1;
+    }
+
+    function hideAnswerKey() {
+      answerKey.hidden = true;
+      answerSummary.textContent = "";
+      answerKeyBody.innerHTML = "";
+      hideKeyBtn.disabled = true;
+    }
+
+    function setSetupLocked(locked) {
+      setupLocked = locked;
+      hostFields.hidden = locked;
+      lockedSetup.classList.toggle("active", locked);
+      startBtn.textContent = locked ? "Reshuffle" : "Shuffle round";
+      editSetupBtn.textContent = locked ? "Edit setup" : "Hide setup";
+      updatePairProgress();
+      if (!locked) hideAnswerKey();
+    }
+
+    function renderAnswerKey() {
+      const undercoverPlayers = assignments
+        .map((assignment, index) => assignment.type === "Undercover" ? `Player ${index + 1}` : null)
+        .filter(Boolean);
+
+      answerSummary.textContent = `Undercover: ${undercoverPlayers.join(", ")}. Normal word: ${normalWordInput.value.trim()}. Undercover word: ${secretWordInput.value.trim()}.`;
+      answerKeyBody.innerHTML = "";
+
+      assignments.forEach((assignment, index) => {
+        const row = document.createElement("tr");
+        const roleClass = assignment.type === "Undercover" ? "undercover" : "normal";
+        const playerCell = document.createElement("td");
+        const roleCell = document.createElement("td");
+        const wordCell = document.createElement("td");
+        const badge = document.createElement("span");
+
+        playerCell.textContent = `Player ${index + 1}`;
+        badge.className = `badge ${roleClass}`;
+        badge.textContent = assignment.type;
+        roleCell.appendChild(badge);
+        wordCell.textContent = assignment.word;
+        row.append(playerCell, roleCell, wordCell);
+        answerKeyBody.appendChild(row);
+      });
+
+      answerKey.hidden = false;
+      hideKeyBtn.disabled = false;
+    }
+
+    function renderPlayers() {
+      playerGrid.innerHTML = "";
+      assignments.forEach((assignment, index) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `player-card${assignment.seen ? " done" : ""}`;
+        card.innerHTML = `
+          <span class="small-label">${assignment.seen ? "Checked" : "Tap to view"}</span>
+          <span class="player-number">Player ${index + 1}</span>
+        `;
+        card.addEventListener("click", () => openReveal(index));
+        playerGrid.appendChild(card);
+      });
+    }
+
+    function openReveal(index) {
+      activeIndex = index;
+      coverTitle.textContent = `Player ${index + 1}`;
+      playerTitle.textContent = `Player ${index + 1}`;
+      cover.hidden = false;
+      wordPanel.hidden = true;
+      shownWord.textContent = "";
+      revealScreen.classList.add("active");
+      revealBtn.focus();
+    }
+
+    function startRound() {
+      const civilian = normalWordInput.value.trim();
+      const undercover = secretWordInput.value.trim();
+      const playerCount = Number(playerCountInput.value);
+      const undercoverCount = Number(undercoverCountInput.value);
+
+      setupError.textContent = "";
+
+      if (!civilian || !undercover) {
+        setupError.textContent = "Please fill in both words before shuffling.";
+        return;
+      }
+
+      if (civilian.toLowerCase() === undercover.toLowerCase()) {
+        setupError.textContent = "Use two different but related words.";
+        return;
+      }
+
+      if (undercoverCount >= playerCount) {
+        setupError.textContent = "Undercover count must be lower than player count.";
+        return;
+      }
+
+      const roles = [
+        ...Array(playerCount - undercoverCount).fill({ type: "Normal", word: civilian }),
+        ...Array(undercoverCount).fill({ type: "Undercover", word: undercover })
+      ];
+
+      assignments = shuffle(roles).map((role) => ({ ...role, seen: false }));
+      currentPairKey = pairKey(civilian, undercover);
+      markPairUsed(civilian, undercover);
+      roundStatus.textContent = "Round Ready";
+      roundText.textContent = `${playerCount} players, ${undercoverCount} undercover. Pass the screen privately.`;
+      renderPlayers();
+      clearReveal();
+      hideAnswerKey();
+      setSetupLocked(true);
+    }
+
+    function setRandomPair() {
+      let availablePairs = wordPairs.filter(([civilian, undercover]) => !usedPairKeys.has(pairKey(civilian, undercover)));
+
+      if (!availablePairs.length) {
+        usedPairKeys = new Set();
+        saveUsedPairKeys();
+        availablePairs = [...wordPairs];
+        setupError.textContent = "All built-in pairs were used. History was reset for a new cycle.";
+      }
+
+      const [civilian, undercover] = availablePairs[Math.floor(Math.random() * availablePairs.length)];
+      normalWordInput.value = civilian;
+      secretWordInput.value = undercover;
+      startRound();
+    }
+
+    revealBtn.addEventListener("click", () => {
+      if (!assignments[activeIndex]) return;
+      shownWord.textContent = assignments[activeIndex].word;
+      cover.hidden = true;
+      wordPanel.hidden = false;
+      doneBtn.focus();
+    });
+
+    doneBtn.addEventListener("click", () => {
+      if (assignments[activeIndex]) {
+        assignments[activeIndex].seen = true;
+      }
+      renderPlayers();
+      clearReveal();
+    });
+
+    startBtn.addEventListener("click", startRound);
+    showKeyBtn.addEventListener("click", () => {
+      if (!assignments.length) return;
+      const shouldShow = window.confirm("PIC only: show the answer key?");
+      if (!shouldShow) return;
+      renderAnswerKey();
+    });
+    hideKeyBtn.addEventListener("click", hideAnswerKey);
+    resetHistoryBtn.addEventListener("click", () => {
+      const shouldReset = window.confirm("Reset used pair history for this browser?");
+      if (!shouldReset) return;
+      usedPairKeys = new Set();
+      if (currentPairKey) {
+        usedPairKeys.add(currentPairKey);
+      }
+      saveUsedPairKeys();
+      updatePairProgress();
+      setupError.textContent = currentPairKey
+        ? "Used pair history was reset. Current round pair is still protected."
+        : "Used pair history was reset.";
+    });
+    editSetupBtn.addEventListener("click", () => {
+      if (setupLocked) {
+        const shouldEdit = window.confirm("PIC only: show the secret setup words?");
+        if (!shouldEdit) return;
+        setSetupLocked(false);
+        clearReveal();
+        return;
+      }
+
+      assignments = assignments.map((assignment) => ({ ...assignment, seen: false }));
+      renderPlayers();
+      clearReveal();
+      hideAnswerKey();
+      setSetupLocked(true);
+    });
+    nextRoundBtn.addEventListener("click", setRandomPair);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") clearReveal();
+    });
+
+    startRound();
+    updatePairProgress();
+  </script>
+</body>
+</html>
