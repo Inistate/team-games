@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{color-scheme:light dark}
+html,body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Mid-Autumn Quiz Night</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900&family=Karla:wght@400;600;700;800&family=Noto+Serif+SC:wght@400;600;900&display=swap">
+
+
+</head>
+<body>
+<style>
+/* A projector screen at night — deliberately single-theme, painted explicitly. */
+:root{
+  --night:#0A0D1B;
+  --night-2:#121732;
+  --panel:#171D3B;
+  --line:#2C3560;
+  --line-soft:#1F264A;
+  --ink:#EFEDF7;
+  --ink-2:#B9BCD8;
+  --muted:#7E85AB;
+  --amber:#F0B653;
+  --amber-deep:#C98A22;
+  --cinnabar:#E4604C;
+  --jade:#5FC79B;
+  --violet:#9D8BE8;
+  --radius:4px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 620px at 78% -12%, rgba(240,182,83,.16), transparent 62%),
+    radial-gradient(760px 520px at 8% 108%, rgba(228,96,76,.13), transparent 66%),
+    var(--night);
+  color:var(--ink);
+  font-family:"Karla","Helvetica Neue",Arial,sans-serif;
+  font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.cjk{font-family:"Noto Serif SC","Songti SC",serif}
+h1,h2,h3,p{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:3px}
+
+#app{
+  min-height:100svh;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  max-width:1500px;margin:0 auto;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex;align-items:center;gap:20px;
+  padding:16px 26px;border-bottom:1px solid var(--line);
+}
+.brand{
+  display:flex;align-items:baseline;gap:12px;min-width:0;
+  background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.brand:hover .zh,.brand:active .zh{color:var(--amber-glow)}
+.brand .zh{transition:color .15s}
+.brand .zh{font-family:"Noto Serif SC",serif;font-weight:900;font-size:22px;letter-spacing:.1em;color:var(--amber)}
+.brand .en{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.roundtag{
+  margin-left:auto;display:flex;align-items:center;gap:14px;
+  font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+.roundtag b{color:var(--ink-2);letter-spacing:.14em}
+.counter{font-variant-numeric:tabular-nums;color:var(--muted)}
+
+/* ---------- session clock ---------- */
+.sess{
+  font-family:"Bodoni Moda",Georgia,serif;font-size:15px;font-weight:700;
+  font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink-2);
+  border-left:1px solid var(--line);padding-left:16px;
+}
+.sess i{font-style:normal;font-weight:400;font-size:12px;color:var(--muted)}
+.sess.over{color:var(--cinnabar)}
+.sess.idle{color:var(--muted)}
+
+/* ---------- timer ---------- */
+.timer{display:flex;align-items:center;gap:10px}
+.timer svg{display:block;transform:rotate(-90deg)}
+.timer .track{fill:none;stroke:var(--line);stroke-width:4}
+.timer .prog{fill:none;stroke:var(--amber);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .95s linear,stroke .3s}
+.timer.low .prog{stroke:var(--cinnabar)}
+.timer .num{
+  font-family:"Bodoni Moda",Georgia,serif;font-size:22px;font-weight:700;
+  font-variant-numeric:tabular-nums;min-width:2.4ch;text-align:right;
+}
+.timer.low .num{color:var(--cinnabar)}
+.timer.idle .num{color:var(--muted)}
+
+/* ---------- stage ---------- */
+.stage{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;padding:44px 40px;text-align:center;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+}
+/* keeps a card taller than the stage from being clipped at the top */
+@supports (justify-content: safe center){ .stage{justify-content:safe center} }
+.kicker{font-size:12px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--amber)}
+.pts-badge{
+  display:inline-block;font-size:12px;font-weight:800;letter-spacing:.12em;
+  color:#241700;background:var(--amber);border-radius:99px;padding:3px 12px;
+}
+
+.q-cjk{
+  font-family:"Noto Serif SC",serif;font-weight:600;
+  font-size:clamp(34px,5.6vw,84px);line-height:1.28;letter-spacing:.10em;
+  max-width:22ch;
+}
+.q-plain{
+  font-family:"Bodoni Moda",Georgia,serif;font-weight:600;
+  font-size:clamp(26px,3.6vw,54px);line-height:1.2;letter-spacing:-.01em;max-width:26ch;
+}
+.q-emoji{font-size:clamp(56px,11vw,150px);line-height:1.1;letter-spacing:.06em}
+.gloss{font-size:clamp(15px,1.5vw,21px);color:var(--ink-2);max-width:52ch}
+
+.answer{
+  border-top:1px solid var(--line);padding-top:22px;margin-top:4px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.answer .big{
+  font-family:"Noto Serif SC",serif;font-weight:900;color:var(--jade);
+  font-size:clamp(38px,6vw,86px);line-height:1.1;letter-spacing:.06em;
+}
+.answer .big.latin{font-family:"Bodoni Moda",Georgia,serif;letter-spacing:0}
+.answer .why{font-size:clamp(14px,1.4vw,19px);color:var(--ink-2);max-width:56ch}
+.veil{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--muted);font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  border-top:1px solid var(--line);padding-top:22px;margin-top:4px;
+}
+.peek{
+  position:fixed;top:78px;left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:8px 16px;font-size:14px;color:var(--amber);box-shadow:0 12px 32px rgba(0,0,0,.5);
+  display:none;z-index:20;
+}
+.peek.on{display:block}
+.peek b{font-family:"Noto Serif SC",serif;font-size:18px}
+
+/* language badge */
+.lang{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:99px;padding:3px 12px;color:var(--muted);
+}
+.lang.any{color:var(--jade);border-color:rgba(95,199,155,.45)}
+.lang.zh{color:var(--violet);border-color:rgba(157,139,232,.45)}
+.badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+
+/* assist / shape puzzle */
+.assist{
+  border-top:1px solid var(--line);margin-top:4px;padding-top:22px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;max-width:64ch;
+}
+.assist .ah{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--violet)}
+.assist .aq{font-size:clamp(16px,1.9vw,24px);color:var(--ink);max-width:46ch}
+.eq{
+  font-family:"Noto Serif SC",serif;font-weight:600;
+  font-size:clamp(30px,4.4vw,60px);letter-spacing:.08em;line-height:1.3;color:var(--amber);
+}
+.opts{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.opts span{
+  font-family:"Noto Serif SC",serif;font-weight:600;
+  font-size:clamp(34px,4.6vw,62px);line-height:1;
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 20px;min-width:1.9em;background:var(--night-2);
+  transition:border-color .2s,color .2s,background .2s;
+}
+.opts span.hit{border-color:var(--jade);color:var(--jade);background:rgba(95,199,155,.12)}
+.opts span.miss{opacity:.3}
+.assist .aa{font-size:clamp(16px,1.8vw,22px);font-weight:700;color:var(--jade)}
+.guessline{
+  font-family:"Bodoni Moda",Georgia,serif;font-size:clamp(15px,1.6vw,20px);
+  color:var(--muted);letter-spacing:.02em;
+}
+
+/* verdict buttons for true/false */
+.tf{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.tf span{
+  border:1px solid var(--line);border-radius:99px;padding:8px 22px;
+  font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.tf span.hit{border-color:var(--jade);color:var(--jade);background:rgba(95,199,155,.10)}
+.tf span.miss{opacity:.35}
+
+/* ---------- intro ----------
+   Left-aligned composition: the stage centres its children, but centred
+   running text and a 3x2 card grid both waste the width. A masthead with a
+   meta block pushed to the right edge, then the rounds as one table, fills it. */
+.intro{
+  width:100%;max-width:1020px;text-align:left;
+  display:flex;flex-direction:column;align-items:stretch;gap:0;
+}
+.masthead{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 40px;align-items:end;
+}
+.intro .kicker{margin:0 0 15px}
+.intro .hero-zh{
+  font-family:"Noto Serif SC",serif;font-weight:900;
+  font-size:clamp(42px,6.6vw,92px);line-height:1;letter-spacing:.08em;color:var(--amber);
+  margin:0 0 4px;
+}
+.intro h1{
+  font-family:"Bodoni Moda",Georgia,serif;font-weight:600;
+  font-size:clamp(23px,2.9vw,40px);line-height:1.06;letter-spacing:-.01em;
+}
+.intro .when{font-size:14.5px;color:var(--muted);letter-spacing:.02em;margin-top:9px}
+.metablock{display:flex;gap:0;align-self:end}
+.metablock div{padding:0 0 0 22px;margin-left:22px;border-left:1px solid var(--line)}
+.metablock div:first-child{margin-left:0}
+.metablock dt{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 3px}
+.metablock dd{
+  margin:0;font-family:"Bodoni Moda",Georgia,serif;font-weight:700;
+  font-size:24px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.metablock dd small{font-family:"Karla",sans-serif;font-size:12px;font-weight:600;color:var(--ink-2);margin-left:3px}
+
+/* rounds grid — the card look, with every cell's footer on one baseline so
+   uneven titles above don't leave ragged dead space */
+.agenda{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);
+  margin-top:30px;
+}
+.ag{background:var(--night-2);padding:18px 20px 18px;display:flex;flex-direction:column}
+.ag .n{
+  font-family:"Bodoni Moda",Georgia,serif;font-size:11.5px;font-weight:700;
+  letter-spacing:.16em;color:var(--amber);
+}
+.ag.special .n{color:var(--cinnabar)}
+.ag .zh{
+  font-family:"Noto Serif SC",serif;font-size:21px;font-weight:600;
+  letter-spacing:.04em;margin-top:7px;line-height:1.2;
+}
+.ag .en{font-size:15px;color:var(--ink);margin-top:7px;line-height:1.3}
+.ag .note{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.4}
+.ag .foot{
+  margin-top:auto;padding-top:16px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+}
+.ag .cnt{font-family:"Bodoni Moda",Georgia,serif;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.ag .cnt small{font-family:"Karla",sans-serif;font-size:11px;font-weight:600;color:var(--muted);margin-left:4px}
+.ag .lg{
+  font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:99px;padding:2px 8px;white-space:nowrap;
+}
+.ag .lg.any{color:var(--jade);border-color:rgba(95,199,155,.4)}
+.ag .lg.zh{color:var(--violet);border-color:rgba(157,139,232,.4)}
+
+/* closing notes */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:24px 40px;margin-top:30px}
+.notes .hd{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.notes p{font-size:14px;line-height:1.55;color:var(--ink-2);max-width:44ch}
+.notes b{color:var(--ink)}
+
+/* ---------- round card / final ---------- */
+
+.roundcard{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:44ch}
+.roundcard .n{font-family:"Bodoni Moda",Georgia,serif;font-size:14px;font-weight:700;letter-spacing:.22em;color:var(--amber)}
+.roundcard .zh{font-family:"Noto Serif SC",serif;font-weight:900;font-size:clamp(40px,7vw,80px);letter-spacing:.1em}
+.roundcard h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:600;font-size:clamp(22px,2.6vw,34px)}
+.roundcard .how{font-size:15.5px;color:var(--ink-2)}
+
+.final{width:100%;max-width:820px}
+.final h2{font-family:"Bodoni Moda",Georgia,serif;font-size:clamp(26px,3.4vw,42px);margin-bottom:6px}
+.podium{display:flex;flex-direction:column;gap:8px;margin-top:24px;text-align:left}
+.prow{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:center;padding:14px 18px;background:var(--night-2);border:1px solid var(--line)}
+.prow.gold{border-color:var(--amber);background:rgba(240,182,83,.10)}
+.prow .rk{font-family:"Bodoni Moda",Georgia,serif;font-size:22px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.prow.gold .rk{color:var(--amber)}
+.prow .nm{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.prow .nm .zh{font-family:"Noto Serif SC",serif;font-size:22px;font-weight:600}
+.prow .nm .en{font-size:13px;color:var(--muted);letter-spacing:.06em}
+.prow .sc{font-family:"Bodoni Moda",Georgia,serif;font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ---------- score strip ---------- */
+.strip{border-top:1px solid var(--line);background:var(--night)}
+/* 1px gaps over a line-coloured ground give clean rules at any column count */
+.teams{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line)}
+.tcell{
+  border:0;padding:11px 14px 12px;
+  display:flex;flex-direction:column;gap:6px;position:relative;
+  background:var(--night);cursor:pointer;text-align:left;
+  transition:background .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.tcell:hover,.tcell:active{background:rgba(240,182,83,.12)}
+body.deduct .tcell:hover,body.deduct .tcell:active{background:rgba(228,96,76,.14)}
+.tcell .row1{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+.tcell .zh{font-family:"Noto Serif SC",serif;font-size:17px;font-weight:600;color:var(--amber)}
+.tcell .sc{font-family:"Bodoni Moda",Georgia,serif;font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+.tcell .en{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tcell .key{position:absolute;top:8px;right:10px;font-size:9.5px;font-weight:800;color:var(--muted);letter-spacing:.1em}
+.tcell .bar{height:4px;background:var(--line)}
+.tcell .bar i{display:block;height:100%;background:var(--amber);transition:width .3s}
+.tcell.lead .bar i{background:var(--jade)}
+.tcell.flash{animation:flash .5s ease-out}
+@keyframes flash{0%{background:rgba(95,199,155,.35)}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.tcell.flash{animation:none}}
+
+.helpbar{
+  display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;
+  padding:9px 26px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);
+}
+.helpbar .keys{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.helpbar kbd{
+  font-family:inherit;font-size:10.5px;font-weight:800;letter-spacing:.06em;
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;
+  padding:1px 6px;color:var(--ink-2);background:var(--panel);
+}
+.helpbar .main{margin-left:auto;display:flex;gap:8px}
+.helpbar .util{display:flex;gap:8px;flex-wrap:wrap}
+.ctrl{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.ctrl:hover,.ctrl:active{border-color:var(--amber);color:var(--amber)}
+.ctrl:disabled{opacity:.35;cursor:default}
+.ctrl:disabled:hover{border-color:var(--line);color:var(--ink)}
+.ctrl.primary{background:var(--amber);border-color:var(--amber);color:#241700}
+.ctrl.primary:hover,.ctrl.primary:active{color:#241700;filter:brightness(1.08)}
+.ctrl.danger{background:var(--cinnabar);border-color:var(--cinnabar);color:#2A0A05}
+.ctrl.danger:hover,.ctrl.danger:active{color:#2A0A05;filter:brightness(1.08)}
+
+/* ---------- intro: narrow ---------- */
+@media (max-width:1000px){
+  .agenda{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .masthead{grid-template-columns:1fr;gap:22px}
+  .metablock{align-self:start}
+  .metablock div{
+    padding:0 18px 0 0;margin:0 18px 0 0;
+    border-left:0;border-right:1px solid var(--line);
+  }
+  .metablock div:last-child{border-right:0;margin-right:0;padding-right:0}
+  .metablock dd{font-size:20px}
+  .agenda{grid-template-columns:1fr;margin-top:24px}
+  .ag{padding:15px 16px}
+  .ag .foot{padding-top:12px}
+  .notes{margin-top:26px;gap:20px}
+  .notes p{font-size:13.5px}
+}
+
+/* ---------- tablet ---------- */
+@media (max-width:900px){
+  .teams{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stage{padding:30px 22px}
+  .helpbar .keys{display:none}
+  .helpbar{padding:9px 16px;gap:8px}
+  .helpbar .main{margin-left:0;flex:1 1 100%}
+  .helpbar .main .ctrl{flex:1 1 0;min-height:44px;font-size:13px;padding:6px 8px}
+  .helpbar .util{flex:1 1 100%;justify-content:space-between}
+  .helpbar .util .ctrl{flex:1 1 0;min-height:34px;font-size:11px;padding:5px 4px;white-space:nowrap}
+}
+
+/* ---------- phone ---------- */
+@media (max-width:620px){
+  .topbar{padding:10px 14px;gap:10px}
+  .brand .en{display:none}
+  .brand .zh{font-size:18px}
+  .roundtag{gap:10px;font-size:10px;letter-spacing:.1em}
+  .sess{padding-left:10px;font-size:13px}
+  .timer svg{width:28px;height:28px}
+  .timer .num{font-size:18px}
+
+  .stage{padding:22px 16px;gap:16px}
+  .q-cjk{letter-spacing:.06em;line-height:1.34;max-width:none}
+  .gloss{font-size:14.5px}
+  .opts{gap:8px}
+  .opts span{padding:9px 12px;font-size:32px;min-width:1.6em}
+  .eq{font-size:27px;letter-spacing:.04em}
+  .answer,.veil,.assist{padding-top:16px}
+  .tf span{padding:7px 16px;font-size:12px}
+  .prow{grid-template-columns:32px 1fr auto;gap:10px;padding:11px 13px}
+
+  .teams{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tcell{padding:9px 11px 10px}
+  .tcell .zh{font-size:15px}
+  .tcell .sc{font-size:19px}
+  .tcell .key{display:none}
+  .peek{top:70px;bottom:auto}
+}
+@media (max-width:380px){
+  .helpbar .util .ctrl{font-size:10px;padding:5px 2px}
+}
+</style>
+
+<div id="app">
+  <div class="topbar">
+    <button class="brand" id="btnHome" type="button" title="Back to the title card (Home)">
+      <span class="zh">中秋灯谜夜</span>
+      <span class="en">Inistate · Happy Friday · 18 Sep 2026</span>
+    </button>
+    <div class="roundtag">
+      <span id="roundLabel">Press start</span>
+      <span class="counter" id="counter"></span>
+      <span class="sess" id="sess" title="Elapsed session time · target 60 minutes of cards">00:00<i>/60</i></span>
+      <span class="timer idle" id="timer">
+        <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+          <circle class="track" cx="17" cy="17" r="14"></circle>
+          <circle class="prog" id="prog" cx="17" cy="17" r="14" stroke-dasharray="87.96" stroke-dashoffset="0"></circle>
+        </svg>
+        <span class="num" id="clock">—</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="strip">
+    <div class="teams" id="teams"></div>
+    <div class="helpbar">
+      <span class="keys">
+        <span><kbd>Space</kbd> next</span>
+        <span><kbd>←</kbd> back</span>
+        <span><kbd>R</kbd> reveal</span>
+        <span><kbd>T</kbd> timer</span>
+        <span><kbd>A</kbd> assist</span>
+        <span><kbd>N</kbd> next round</span>
+        <span><kbd>H</kbd> peek</span>
+        <span><kbd>1</kbd>–<kbd>6</kbd> award · <kbd>⇧</kbd> deduct</span>
+        <span><kbd>⌫</kbd> undo</span>
+        <span><kbd>0</kbd> standings</span>
+        <span><kbd>Home</kbd> title card</span>
+      </span>
+      <span class="main">
+        <button class="ctrl" id="btnPrev" type="button" aria-label="Previous card">◀</button>
+        <button class="ctrl" id="btnAssist" type="button">Assist</button>
+        <button class="ctrl" id="btnReveal" type="button">Reveal</button>
+        <button class="ctrl" id="btnTimer" type="button">Timer</button>
+        <button class="ctrl primary" id="btnNext" type="button">Next ▶</button>
+      </span>
+      <span class="util">
+        <button class="ctrl" id="btnHomeBtn" type="button">Home</button>
+        <button class="ctrl" id="btnSign" type="button" aria-pressed="false">＋ award</button>
+        <button class="ctrl" id="btnPeek" type="button" aria-pressed="false">Peek</button>
+        <button class="ctrl" id="btnSkip" type="button">Skip round</button>
+        <button class="ctrl" id="btnUndo" type="button" aria-label="Undo last score">Undo</button>
+        <button class="ctrl" id="btnStand" type="button">Standings</button>
+        <button class="ctrl" id="btnReset" type="button">Reset</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="peek" id="peek"></div>
+
+<script>
+/* ------------------------------------------------------------------ teams */
+/* Teams are named after the teas on the table, NOT after festival things —
+   the score strip sits on screen all night, so a team called 玉兔 would hand
+   Round 2 its own answer. Nothing in this list appears in any answer. */
+const TEAMS = [
+  {zh:"茉莉", en:"Jasmine"},
+  {zh:"乌龙", en:"Oolong"},
+  {zh:"普洱", en:"Pu'er"},
+  {zh:"菊花", en:"Chrysanthemum"},
+  {zh:"白牡丹", en:"White Peony"},
+  {zh:"银针", en:"Silver Needle"}
+];
+
+/* ------------------------------------------------------------------ deck
+   Language policy, deliberate:
+   - Round 1 is the only round where reading Chinese helps. Every card there
+     carries an ASSIST tier (press A) that is pure shape-matching or English
+     logic, playable by anyone, for half points.
+   - Rounds 2, 3, 4, the bonus and the whole finale need no Chinese at all.
+   - Round 4 puts the autumn moon festivals of India, Japan, Korea and
+     Vietnam on the board, so the Chinese-reading teams are the ones guessing.
+------------------------------------------------------------------------- */
+const DECK = [
+  {kind:"intro"},
+
+  {kind:"round", n:"ROUND 01", zh:"灯谜闯关", en:"Riddle Rush",
+   how:"A Chinese character riddle is solved by taking apart the shapes of the characters, not their meaning. Shout the answer for full points. Nobody gets it in 30 seconds? Press A — every card has a shape puzzle or an English-logic version worth half, and that one is open to everybody."},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"山上还有山", en:"A mountain on top of a mountain", a:"出", why:"山 stacked on 山 → 出. The warm-up — say the rule out loud before you score it.", pts:10, secs:45,
+   assist:{q:"Which character do these two parts make when stacked?", eq:"山 ＋ 山", opts:["岩","出","峰","岳"], a:"出"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"一口吃掉牛尾巴", en:"One mouth eats the ox's tail", a:"告", why:"牛 loses its tail stroke and sits on 口 → 告", pts:10, secs:60,
+   assist:{q:"An ox 牛 with its tail stroke removed, sitting on a mouth 口. Which one is it?", eq:"牛 (no tail) ＋ 口", opts:["吉","呆","告","舌"], a:"告"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"十日十月", en:"Ten suns, ten moons", a:"朝", why:"十 + 日 + 十 + 月 assembled → 朝, morning", pts:10, secs:60,
+   assist:{q:"Four parts, one character. Which one contains all of them?", eq:"十 ＋ 日 ＋ 十 ＋ 月", opts:["明","朗","朝","期"], a:"朝"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"一夜又一夜", en:"One evening, and another evening", a:"多", why:"夕 (evening) written twice → 多, many", pts:10, secs:60,
+   assist:{q:"The part 夕 means evening. Which character is just 夕 written twice?", eq:"夕 ＋ 夕", opts:["名","多","外","岁"], a:"多"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"三人同日来", en:"Three people arrive on the same day", a:"春", why:"三 + 人 + 日 → 春, spring", pts:10, secs:60,
+   assist:{q:"Three 三, person 人, sun 日 — stacked in that order. Which one?", eq:"三 ＋ 人 ＋ 日", opts:["春","者","香","昔"], a:"春"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"一只黑狗，不叫不吼", en:"A black dog that neither barks nor howls", a:"默", why:"黑 (black) + 犬 (dog) → 默, silence", pts:10, secs:60,
+   assist:{q:"Black 黑 on the left, dog 犬 on the right. Which character is it — and what do you think it means?", eq:"黑 ＋ 犬", opts:["墨","黯","默","猷"], a:"默 · silence"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"有水可养鱼虾，有土可种庄稼", en:"Add water and fish live there; add earth and crops grow", a:"也", why:"氵+也 = 池 (pond) · 土+也 = 地 (land)", pts:20, secs:75,
+   assist:{q:"One part is missing from both. Which is it?", eq:"氵 ＋ ？ ＝ 池　·　土 ＋ ？ ＝ 地", opts:["己","也","巳","匕"], a:"也"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"二三四五六七八九", en:"Two three four five six seven eight nine — name the idiom", a:"缺衣少食", why:"一 and 十 are missing. 缺一少十 (short of one and ten) puns on 缺衣少食 — short of clothing and food.", pts:20, secs:75,
+   assist:{q:"Forget the idiom. Which two numbers are missing from that sequence?", a:"1 and 10 — 一 and 十, which sound like 衣 (clothing) and 食 (food)"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"蜜饯黄连", en:"Coptis root candied in honey — name the idiom", a:"同甘共苦", why:"The sweetest coating on the bitterest root: sharing the good and the hard together.", pts:20, secs:75,
+   assist:{q:"The clue puts the sweetest possible thing around the bitterest possible thing. What English idiom means going through good times and bad together?", a:"Through thick and thin · taking the bitter with the sweet → 同甘共苦"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"哑巴打手势", en:"A mute person gesturing — name the idiom", a:"不言而喻", why:"Understood without a word being said.", pts:20, secs:75,
+   assist:{q:"Finish the English phrase: “it goes ______ saying.”", a:"without → 不言而喻, understood without words"}},
+
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"人有它则变大", en:"A person who has it becomes big", a:"一", why:"人 (person) + 一 (one) → 大, big. So the answer is the 一.", pts:10, secs:45,
+   assist:{q:"One stroke turns 人 (person) into 大 (big). Which stroke is it?", eq:"人 ＋ ？ ＝ 大", opts:["丶","一","二","十"], a:"一"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"上下一体", en:"Up and down, one body", a:"卡", why:"上 and 下 merged into a single character → 卡", pts:10, secs:60,
+   assist:{q:"Up 上 and down 下 fused into one character. Which is it?", eq:"上 ＋ 下 (merged)", opts:["占","卡","卞","卜"], a:"卡"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"四面都是山，山山都相连", en:"Mountains on all four sides, every one joined to the next", a:"田", why:"Four 山 interlocked → 田, a field", pts:10, secs:60,
+   assist:{q:"Which character is a square divided into four equal parts?", eq:"山 ＋ 山 ＋ 山 ＋ 山 (interlocked)", opts:["由","田","甲","申"], a:"田"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"一箭穿心", en:"An arrow through the heart", a:"必", why:"心 (heart) with a stroke driven through it → 必", pts:10, secs:60,
+   assist:{q:"A heart 心 with one stroke driven straight through it. Which one?", eq:"心 ＋ one stroke through", opts:["忘","必","忍","忙"], a:"必"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"王先生白小姐坐在石头上", en:"Mr Wang and Miss Bai sitting on a rock", a:"碧", why:"王 + 白 above 石 → 碧, jade-green", pts:20, secs:75,
+   assist:{q:"Three parts, one character — two on top, one underneath. Which is it?", eq:"王 ＋ 白　over　石", opts:["珀","皇","碧","磊"], a:"碧 · jade-green"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"逆水行舟", en:"Rowing a boat against the current — name the idiom", a:"不进则退", why:"Against the current, not advancing is falling back.", pts:20, secs:75,
+   assist:{q:"You are rowing against the current. What happens the moment you stop rowing?", a:"You go backwards → 不进则退, not to advance is to fall back"}},
+  {kind:"q", r:1, form:"cjk", lang:"zh", q:"举重比赛", en:"A weightlifting contest — name the idiom", a:"斤斤计较", why:"Counting every 斤 (catty) — quibbling over the smallest amounts.", pts:20, secs:75,
+   assist:{q:"The idiom weighs out every last unit. Which English idiom means quibbling over tiny amounts?", a:"Splitting hairs · haggling over pennies → 斤斤计较"}},
+
+  {kind:"round", n:"ROUND 02", zh:"表情包猜谜", en:"Emoji Decode",
+   how:"Every card is a Mid-Autumn thing spelled in emoji. Shout it in English, Chinese, Malay, Hindi, Tamil — any language counts, and close enough counts. Thirty seconds a card."},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🌕🥮", a:"Mid-Autumn Festival 中秋节", latin:true, why:"Full moon plus mooncake — the festival itself.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🐇🌕", a:"Jade Rabbit 玉兔", latin:true, why:"The rabbit pounding herbs on the moon.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🧚‍♀️🚀🌕", a:"Chang'e flies to the moon 嫦娥奔月", latin:true, why:"She drank the elixir and floated up.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🏹☀️☀️☀️", a:"Hou Yi shoots the suns 后羿射日", latin:true, why:"Nine of ten suns shot down — Chang'e's husband.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🌕📸", a:"Everybody photographing the moon", latin:true, why:"Half the office camera roll, every year, and it always comes out as a white dot.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🍊🎩", a:"Pomelo hat 柚子帽", latin:true, why:"The carved peel worn by kids — 柚 puns on 佑, blessing.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🌸🍶", a:"Osmanthus wine 桂花酒", latin:true, why:"The tree is said to grow on the moon.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🥮❄️", a:"Snowskin mooncake 冰皮月饼", latin:true, why:"Served chilled — a Hong Kong invention from the 1980s.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"👨‍👩‍👧‍👦🌕", a:"Reunion 团圆", latin:true, why:"团圆 and 月圆 share the same 圆, round and whole — the festival turns on that pun.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🥚🥮", a:"Salted egg yolk mooncake 蛋黄月饼", latin:true, why:"One yolk, two yolks, or four if you're serious.", pts:15, secs:30},
+
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🌕🔭", a:"Moon-viewing 赏月", latin:true, why:"The actual activity the whole festival is built around.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🥮🔪🍴", a:"Cutting the mooncake to share", latin:true, why:"Traditionally into as many pieces as there are people at the table.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🐉🥁", a:"Dragon or lion dance", latin:true, why:"Especially in Vietnam, where the festival belongs to the children.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🌕🌗🌑", a:"The phases of the moon · a lunar month", latin:true, why:"29.5 days from one full moon to the next — remember that number.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"✈️🏠🌕", a:"Travelling home for the festival", latin:true, why:"The reason Chuseok is the biggest travel weekend in Korea.", pts:15, secs:30},
+  {kind:"q", r:2, form:"emoji", lang:"any", q:"🕯️🏮🚶", a:"A lantern procession", latin:true, why:"Kids, a stick, a candle, and one adult walking behind with a fire extinguisher.", pts:15, secs:30},
+
+  {kind:"round", n:"ROUND 03", zh:"真假中秋", en:"Fact or Folklore",
+   how:"Sixteen claims about the festival, all in English. Buzz in and call it — FACT if it is true, FOLKLORE if it is a good story that isn't. Correct is +15, wrong is −15, so guessing costs you."},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Mid-Autumn always falls on the 15th day of the 8th lunar month.", a:"FACT", why:"In 2026 that lands on Friday 25 September.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Snowskin mooncakes are an ancient Tang dynasty recipe.", a:"FOLKLORE", why:"They were invented in Hong Kong in the 1980s.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Hou Yi shot down all ten suns in the sky.", a:"FOLKLORE", why:"He shot nine and left one, which is why we still have daylight.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Pomelo peel is worn as a hat because the word for pomelo sounds like the word for “bless”.", a:"FACT", why:"柚 and 佑 — same reason the fruit is on the table at all.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Mid-Autumn Festival is a federal public holiday in Malaysia.", a:"FOLKLORE", why:"Widely celebrated, but not a public holiday — hence a Happy Friday.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"The Mid-Autumn full moon is always the largest full moon of the year.", a:"FOLKLORE", why:"Apparent size depends on how close the moon is at perigee, which varies year to year.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"In the Japanese version of the legend, the moon rabbit is pounding rice cake.", a:"FACT", why:"Mochi rather than medicine — same rabbit, different mortar.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"“Tanglung” entered Bahasa Malaysia from the Hokkien word for lantern.", a:"FACT", why:"From 灯笼, teng-lang.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Historians have documented mooncakes being used to carry secret messages for a rebellion.", a:"FOLKLORE", why:"A beloved late-Yuan story, but not something the records support.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"In the legend a tree grows on the moon, and a man is endlessly chopping it down.", a:"FACT", why:"吴刚 and the osmanthus tree — the cut closes up behind every swing.", pts:15, secs:15},
+
+  {kind:"q", r:3, form:"tf", lang:"any", q:"The Chinese lunar calendar inserts an extra month every few years to stay in step with the seasons.", a:"FACT", why:"A leap month. Without it, Mid-Autumn would eventually drift into spring.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"The word “mooncake” appears in Chinese records as early as the Song dynasty.", a:"FACT", why:"月饼 turns up in Song-era writing, centuries before the rebellion story.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"Mid-Autumn Festival is a public holiday in mainland China.", a:"FACT", why:"It is — which is exactly why it isn't one here, and why this is a Happy Friday.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"The far side of the moon never receives any sunlight.", a:"FOLKLORE", why:"It gets as much sun as the near side. It is the far side, not the dark side — we just never see it from here.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"A pomelo and a grapefruit are the same fruit.", a:"FOLKLORE", why:"The grapefruit is a hybrid — pomelo crossed with sweet orange. The pomelo is the parent.", pts:15, secs:15},
+  {kind:"q", r:3, form:"tf", lang:"any", q:"The moon looks bigger near the horizon because it is genuinely closer to us there.", a:"FOLKLORE", why:"It is fractionally farther away at the horizon. The size difference is entirely in your head — the moon illusion.", pts:15, secs:15},
+
+  {kind:"round", n:"ROUND 04", zh:"同一个月亮", en:"One Moon, Many Festivals",
+   how:"The same autumn full moon is a festival in half of Asia. Seventeen cards on India, Japan, Korea, Vietnam and Myanmar — if this is your festival, this is your round. English throughout."},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"India's autumn full-moon festival, when families leave rice pudding out in the moonlight overnight — name it.", a:"Sharad Purnima", latin:true, why:"Also called Kojagiri Purnima. It falls on the full moon of Ashvin, the same harvest moon.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"“Kojagiri” comes from a Sanskrit phrase. What does it ask?", a:"“Who is awake?” — को जागर्ति", latin:true, why:"Lakshmi is said to visit whoever is still awake that night, so people stay up.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Why is the kheer left out under the moon all night on Sharad Purnima?", a:"The moonlight is believed to make it healing and nourishing", latin:true, why:"It's eaten the next morning. Same instinct as everyone else that night: put the food where the moon can see it.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Japan's moon-viewing festival, served with rice dumplings and pampas grass — name it.", a:"Tsukimi / Otsukimi 月見", latin:true, why:"Tsukimi dango stacked in a pyramid, susuki grass in a vase.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Korea's three-day autumn harvest festival, with half-moon-shaped rice cakes — name it.", a:"Chuseok 추석", latin:true, why:"The rice cakes are songpyeon, folded into half-moons.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Vietnam's version is above all a children's festival, with lion dances and star-shaped lanterns. Name it.", a:"Tết Trung Thu", latin:true, why:"Same night, and the star lantern instead of the round one.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Myanmar's festival of lights on the full moon of Thadingyut marks the end of what?", a:"Buddhist Lent (Vassa)", latin:true, why:"Houses and streets lit up to welcome the Buddha's return.", pts:15, secs:30},
+  {kind:"q", r:4, form:"tf", lang:"any", q:"Chuseok is a national public holiday in Korea.", a:"FACT", why:"Three days of it, and the biggest travel weekend of the Korean year.", pts:15, secs:15},
+  {kind:"q", r:4, form:"tf", lang:"any", q:"Mid-Autumn, Chuseok and Tsukimi are all tied to the full moon of the 8th lunar month.", a:"FACT", why:"One moon, many names — which is the whole point of this round.", pts:15, secs:15},
+
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Which Hindu month's full moon is Sharad Purnima?", a:"Ashvin (Ashwin)", latin:true, why:"The harvest month — the first full moon after the monsoon breaks.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Which goddess is said to visit whoever is still awake on Kojagiri night?", a:"Lakshmi", latin:true, why:"Which is the whole reason for staying up — and for the question “ko jagarti?”", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"What are the rice dumplings stacked in a pyramid at Tsukimi called?", a:"Tsukimi dango 月見団子", latin:true, why:"Fifteen of them for the fifteenth night, in the strictest version.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"What grass is displayed at Tsukimi, standing in for rice stalks?", a:"Susuki — Japanese pampas grass", latin:true, why:"A harvest offering when the rice itself isn't ready yet.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"What are the half-moon-shaped Korean rice cakes eaten at Chuseok called?", a:"Songpyeon 송편", latin:true, why:"Folded into a half moon — the one that is still on its way to full.", pts:15, secs:30},
+
+  {kind:"q", r:4, form:"plain", lang:"any", q:"Chuseok is often translated into English as “Korean ______”. What?", a:"Thanksgiving", latin:true, why:"Harvest, family, far too much food, and a great deal of traffic.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"What is the star-shaped lantern carried by Vietnamese children called?", a:"Đèn ông sao", latin:true, why:"Literally “star lantern” — a five-pointed star on a stick.", pts:15, secs:30},
+  {kind:"q", r:4, form:"plain", lang:"any", q:"At Chuseok, Korean families visit and tidy their ancestors' graves. What is that visit called?", a:"Seongmyo 성묘", latin:true, why:"The rite performed at home is charye 차례 — two different things, and both matter.", pts:15, secs:30},
+
+  {kind:"round", n:"BONUS", zh:"三十秒五样", en:"Name Five in Thirty",
+   how:"Host picks a team, starts the clock, and they name five in thirty seconds. Miss it and the next team gets the same list for half points."},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five mooncake fillings.", a:"Lotus paste · red bean · salted egg yolk · pandan · durian · white lotus · mixed nuts 五仁", latin:true, why:"五仁 is the one everybody argues about.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five festivals celebrated in Malaysia.", a:"Hari Raya · Chinese New Year · Deepavali · Mid-Autumn · Thaipusam · Wesak · Gawai · Christmas", latin:true, why:"Any five will do.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five countries or cultures that hold an autumn full-moon festival.", a:"China · India · Japan · Korea · Vietnam · Myanmar · Malaysia · Singapore · Thailand", latin:true, why:"Round 4 just gave most of these away, so no excuses.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five round things on the table tonight.", a:"Mooncake · pomelo · the moon · teacup · plate · lantern · orange", latin:true, why:"The joke is that the answer is the festival's whole point — round means whole, and whole means everybody's here.", pts:20, secs:30},
+
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five words for “moon” in five different languages.", a:"moon · 月亮 yuèliang · bulan (Malay) · चाँद chaand (Hindi) · நிலா nila (Tamil) · 月 tsuki (Japanese) · 달 dal (Korean) · luna", latin:true, why:"Everybody in the room has one. This card is why nobody sits it out.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five teas — and none of the six team names count.", a:"龙井 longjing · 铁观音 tieguanyin · 大红袍 da hong pao · 碧螺春 biluochun · 大麦茶 barley tea · teh tarik · English breakfast · green · black", latin:true, why:"The obvious six are sitting in front of them with team names on. Make them work past it.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five things you can see in the night sky without a telescope.", a:"Moon · stars · planets · the Milky Way · meteors · satellites · clouds · aircraft", latin:true, why:"Accept anything genuinely visible. Do not accept the far side of the moon.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five countries whose flag carries a moon.", a:"Malaysia · Singapore · Turkey · Pakistan · Algeria · Tunisia · Mauritania · Azerbaijan · Uzbekistan · Nepal", latin:true, why:"Ours is one of them, and nobody ever gets it first.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five lunar missions or moon programmes.", a:"Apollo 11 · Chang'e (China) · Chandrayaan (India) · Artemis · Luna · Surveyor · Apollo 13", latin:true, why:"China named its programme after the woman who flew there first, and India named its after the moon itself.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five Malaysian desserts.", a:"Kuih lapis · cendol · ais kacang · onde-onde · seri muka · pulut hitam · kuih talam · bubur cha cha", latin:true, why:"The one round where the pantry conversation finally pays off.", pts:20, secs:30},
+  {kind:"q", r:5, form:"plain", lang:"any", q:"Name five words that rhyme with “moon”.", a:"Soon · spoon · noon · June · tune · balloon · monsoon · cartoon · dune", latin:true, why:"Pure filler, and the loudest round of the night.", pts:20, secs:30},
+
+  {kind:"round", n:"FINALE", zh:"巅峰一谜", en:"Sudden Death",
+   how:"Top two teams only, and no Chinese needed to win it. Three cards, getting harder. Each team writes one answer, no shouting, then both are read out together. First card either team gets right takes the 50 points and the title — so if the first card splits them, the rest never get played."},
+  {kind:"q", r:6, form:"plain", lang:"any", q:"Mid-Autumn 2025 fell on 6 October. In 2026 it falls on 25 September — eleven days earlier. Why does the date walk backwards each year?", a:"The lunar year is about 11 days shorter than the solar year", latin:true, why:"Twelve lunar months come to 354 days against the sun's 365 — and it is exactly 354 days from 6 Oct 2025 to 25 Sep 2026. The festival slides earlier every year until a leap month is inserted and it jumps forward again. Accept any answer that gets the lunar-vs-solar mismatch.", pts:50, secs:75},
+  {kind:"q", r:6, form:"plain", lang:"any", q:"The moon rises roughly 50 minutes later each night. So why does the full moon, of all of them, rise just as the sun is setting?", a:"Because “full” means the moon is opposite the sun", latin:true, why:"A full moon is the moon on the far side of Earth from the sun — so it has to come up as the sun goes down, and it stays up all night. That is the only reason a Mid-Autumn evening works at all.", pts:50, secs:75},
+  {kind:"q", r:6, form:"guess", lang:"any", q:"Tiebreak. The moon is drifting away from Earth. How many centimetres further away does it get each year? Closest wins.", a:"About 3.8 cm a year", latin:true, why:"Measured by bouncing lasers off the reflectors the Apollo missions left behind. Over a human lifetime the moon retreats about three metres — so tonight's moon is very slightly smaller than the one your grandparents looked at.", pts:50, secs:45},
+
+  {kind:"final"}
+];
+
+const ROUND_NAMES = {
+  1:"Round 1 · 灯谜闯关",
+  2:"Round 2 · 表情包猜谜",
+  3:"Round 3 · 真假中秋",
+  4:"Round 4 · 同一个月亮",
+  5:"Bonus · 三十秒五样",
+  6:"Finale · 巅峰一谜"
+};
+
+/* ------------------------------------------------------------------ state */
+const SKEY = 'mid-autumn-quiz-2026';
+let scores, idx = 0, revealed = false, assistOn = false, history = [];
+try { scores = JSON.parse(localStorage.getItem(SKEY)); } catch(e) { scores = null; }
+if (!Array.isArray(scores) || scores.length !== TEAMS.length) scores = TEAMS.map(() => 0);
+function persist(){ try { localStorage.setItem(SKEY, JSON.stringify(scores)); } catch(e) {} }
+
+/* ------------------------------------------------------------------ timer */
+const CIRC = 2 * Math.PI * 14;
+let tLeft = 0, tTotal = 0, tId = null;
+const elTimer = document.getElementById('timer');
+const elClock = document.getElementById('clock');
+const elProg  = document.getElementById('prog');
+elProg.setAttribute('stroke-dasharray', CIRC.toFixed(2));
+
+function paintTimer(){
+  if (!tTotal){
+    elClock.textContent = '—';
+    elProg.setAttribute('stroke-dashoffset', CIRC.toFixed(2));
+    elTimer.className = 'timer idle';
+    return;
+  }
+  elClock.textContent = tLeft;
+  elProg.setAttribute('stroke-dashoffset', (CIRC * (1 - tLeft / tTotal)).toFixed(2));
+  elTimer.className = 'timer' + (tLeft <= 5 ? ' low' : '') + (tId ? '' : ' idle');
+}
+function armTimer(secs){
+  clearInterval(tId); tId = null;
+  tTotal = secs || 0; tLeft = tTotal;
+  paintTimer();
+}
+function toggleTimer(){
+  if (!tTotal) return;
+  if (tId){ clearInterval(tId); tId = null; paintTimer(); return; }
+  if (tLeft === 0) tLeft = tTotal;
+  tId = setInterval(() => {
+    tLeft--;
+    if (tLeft <= 0){ tLeft = 0; clearInterval(tId); tId = null; }
+    paintTimer();
+  }, 1000);
+  paintTimer();
+}
+
+/* ------------------------------------------------------------------ render */
+const stage = document.getElementById('stage');
+const elRound = document.getElementById('roundLabel');
+const elCount = document.getElementById('counter');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function questionsInRound(r){ return DECK.filter(d => d.kind === 'q' && d.r === r); }
+
+function render(){
+  const it = DECK[idx];
+  document.getElementById('btnReveal').disabled = it.kind !== 'q';
+  const bA = document.getElementById('btnAssist');
+  bA.disabled = !(it.kind === 'q' && it.assist && it.form !== 'shape');
+  bA.classList.toggle('primary', assistOn && !bA.disabled);
+  document.getElementById('btnPeek').disabled = it.kind !== 'q';
+  document.getElementById('btnTimer').disabled = it.kind !== 'q';
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnHomeBtn').disabled = idx === 0;
+  const bN = document.getElementById('btnNext');
+  bN.disabled = idx === DECK.length - 1;
+  bN.textContent = idx === 0 ? 'Start ▶' : 'Next ▶';
+  setPeek(false);
+
+  if (it.kind === 'intro'){
+    elRound.textContent = 'Press start';
+    elCount.textContent = '';
+    armTimer(0);
+    const cards = DECK.filter(d => d.kind === 'q');
+    const nIn = r => cards.filter(c => c.r === r).length;
+    const board = cards.filter(c => c.r !== 6).reduce((a,c) => a + c.pts, 0) + 50;
+    const openPts = cards.filter(c => c.lang === 'any' && c.r !== 6).reduce((a,c) => a + c.pts, 0) + 50;
+
+    const ROWS = [
+      {r:1, tag:'ROUND 01', zh:'灯谜闯关', en:'Riddle Rush',              note:'shout it, or press A for the shape puzzle', lang:'zh'},
+      {r:2, tag:'ROUND 02', zh:'表情包猜谜', en:'Emoji Decode',            note:'30 seconds a card',                        lang:'any'},
+      {r:3, tag:'ROUND 03', zh:'真假中秋', en:'Fact or Folklore',          note:'buzz in · +15 / −15',                      lang:'any'},
+      {r:4, tag:'ROUND 04', zh:'同一个月亮', en:'One Moon, Many Festivals', note:'India · Japan · Korea · Vietnam',          lang:'any'},
+      {r:5, tag:'BONUS',    zh:'三十秒五样', en:'Name Five in Thirty',      note:'the flex round — drop or add at will',      lang:'any', special:true},
+      {r:6, tag:'FINALE',   zh:'巅峰一谜', en:'Sudden Death',              note:'escalating · one card decides it',         lang:'any', special:true}
+    ];
+
+    stage.innerHTML =
+      '<div class="intro">'
+      + '<div class="masthead">'
+        + '<div>'
+          + '<p class="kicker">Happy Friday · Friday 18 September 2026 · one week to 中秋节</p>'
+          + '<p class="hero-zh cjk">中秋灯谜夜</p>'
+          + '<h1>Mid-Autumn Quiz Night</h1>'
+          + '<p class="when">4:00 – 5:15 pm · one screen, no paper, no props</p>'
+        + '</div>'
+        + '<dl class="metablock">'
+          + '<div><dt>Cards</dt><dd>' + cards.length + '</dd></div>'
+          + '<div><dt>Target</dt><dd>60<small>min</small></dd></div>'
+          + '<div><dt>Teams</dt><dd>6<small>× 4</small></dd></div>'
+        + '</dl>'
+      + '</div>'
+      + '<div class="agenda">'
+        + ROWS.map(x =>
+            '<div class="ag' + (x.special ? ' special' : '') + '">'
+            + '<span class="n">' + x.tag + '</span>'
+            + '<span class="zh cjk">' + x.zh + '</span>'
+            + '<span class="en">' + x.en + '</span>'
+            + '<span class="note">' + x.note + '</span>'
+            + '<span class="foot">'
+              + '<span class="cnt">' + nIn(x.r) + '<small>cards</small></span>'
+              + '<span class="lg ' + x.lang + '">' + (x.lang === 'zh' ? '中文 + assist' : 'Any language') + '</span>'
+            + '</span>'
+            + '</div>').join('')
+      + '</div>'
+      + '<div class="notes">'
+        + '<div><p class="hd">No Chinese needed to win</p><p>Round 1 is the only round where it helps, and every card there has an assist tier — a shape puzzle or English logic, open to everyone, worth half. That leaves <b>' + openPts + ' of the ' + board + ' points</b> answerable in any language.</p></div>'
+        + '<div><p class="hd">Round 4 turns the tables</p><p>The autumn moon festivals of India, Japan, Korea and Vietnam — Sharad Purnima, Chuseok, Tsukimi, Tết Trung Thu. On this round the Chinese-reading teams are the ones guessing.</p></div>'
+        + '<div><p class="hd">Pacing and the runner rule</p><p>The deck is over-stocked on purpose. Watch the session clock against its 60-minute target and press <b>N</b> to skip a round that drags. A buzz only counts if the team\'s runner touches the screen.</p></div>'
+      + '</div>'
+      + '</div>';
+    return;
+  }
+
+  if (it.kind === 'round'){
+    elRound.textContent = it.n + ' · ' + it.en;
+    elCount.textContent = questionsInRound(DECK.slice(idx).find(d => d.kind === 'q').r).length + ' cards';
+    armTimer(0);
+    stage.innerHTML =
+      '<div class="roundcard">'
+      + '<p class="n">' + esc(it.n) + '</p>'
+      + '<p class="zh cjk">' + esc(it.zh) + '</p>'
+      + '<h2>' + esc(it.en) + '</h2>'
+      + '<p class="how">' + esc(it.how) + '</p>'
+      + '</div>';
+    return;
+  }
+
+  if (it.kind === 'final'){
+    elRound.textContent = 'Standings';
+    elCount.textContent = '';
+    armTimer(0);
+    renderFinal();
+    return;
+  }
+
+  /* a question card */
+  const inRound = questionsInRound(it.r);
+  elRound.textContent = ROUND_NAMES[it.r];
+  elCount.textContent = (inRound.indexOf(it) + 1) + ' / ' + inRound.length;
+  armTimer(it.secs);
+
+  const shape = it.form === 'shape';
+  const showAssist = shape || (assistOn && it.assist);
+
+  let qHtml;
+  if (it.form === 'cjk')        qHtml = '<p class="q-cjk cjk">' + esc(it.q) + '</p>';
+  else if (it.form === 'emoji') qHtml = '<p class="q-emoji">' + esc(it.q) + '</p>';
+  else                          qHtml = '<p class="q-plain">' + esc(it.q) + '</p>';
+
+  /* assist / shape panel */
+  let assistHtml = '';
+  if (showAssist){
+    const A = it.assist;
+    assistHtml = '<div class="assist">'
+      + (shape ? '' : '<p class="ah">Assist tier · open to everyone · half points</p>')
+      + (A.q ? '<p class="aq">' + esc(A.q) + '</p>' : '')
+      + (A.eq ? '<p class="eq cjk">' + esc(A.eq) + '</p>' : '')
+      + (A.opts ? '<div class="opts">' + A.opts.map(o =>
+          '<span class="' + (revealed ? (A.a.charAt(0) === o ? 'hit' : 'miss') : '') + '">' + esc(o) + '</span>'
+        ).join('') + '</div>' : '')
+      + (revealed && !A.opts ? '<p class="aa">' + esc(A.a) + '</p>' : '')
+      + '</div>';
+  }
+
+  let ansHtml = '';
+  if (!revealed){
+    ansHtml = '<div class="veil"><span>Answer hidden</span><span style="letter-spacing:.06em;text-transform:none;font-weight:400">Hold H to peek · press R to reveal'
+      + (it.assist && !shape ? ' · press A for the assist tier' : '') + '</span></div>';
+  } else if (it.form === 'tf'){
+    const fact = it.a === 'FACT';
+    ansHtml = '<div class="answer"><div class="tf">'
+      + '<span class="' + (fact ? 'hit' : 'miss') + '">Fact</span>'
+      + '<span class="' + (fact ? 'miss' : 'hit') + '">Folklore</span>'
+      + '</div><p class="why">' + esc(it.why) + '</p></div>';
+  } else {
+    ansHtml = '<div class="answer"><p class="big' + (it.latin ? ' latin' : ' cjk') + '">' + esc(it.a) + '</p>'
+      + '<p class="why">' + esc(it.why) + '</p></div>';
+  }
+
+  const langBadge = it.lang === 'zh'
+    ? '<span class="lang zh">Chinese · assist available</span>'
+    : '<span class="lang any">Any language</span>';
+
+  stage.innerHTML =
+    '<div class="badges"><span class="pts-badge">' + currentPts() + ' points'
+      + (it.r === 3 ? ' · wrong −15' : '')
+      + (showAssist && !shape ? ' · assist tier' : '') + '</span>' + langBadge + '</div>'
+    + qHtml
+    + (it.en ? '<p class="gloss">' + esc(it.en) + '</p>' : '')
+    + (it.form === 'guess' ? '<p class="guessline">Both teams write a number. Closest wins — exact ties go to whoever wrote it first.</p>' : '')
+    + (it.form === 'tf' && !revealed ? '<div class="tf"><span>Fact</span><span>Folklore</span></div>' : '')
+    + assistHtml
+    + ansHtml;
+}
+
+function renderFinal(){
+  const order = TEAMS.map((t,i) => ({...t, s: scores[i]})).sort((a,b) => b.s - a.s);
+  const top = order[0].s;
+  stage.innerHTML =
+    '<div class="final">'
+    + '<p class="kicker">巅峰之夜 · Final standings</p>'
+    + '<h2>' + (top > 0 ? esc(order[0].zh) + ' pour the first cup' : 'Nothing on the board yet') + '</h2>'
+    + '<p class="gloss" style="margin:0 auto">Champion 150 · runner-up 90 · third 60, as vouchers. Then mooncakes, pomelo and hot tea.</p>'
+    + '<div class="podium">'
+    + order.map((t,i) =>
+        '<div class="prow' + (i === 0 && top > 0 ? ' gold' : '') + '">'
+        + '<span class="rk">' + (i+1) + '</span>'
+        + '<span class="nm"><span class="zh cjk">' + esc(t.zh) + '</span><span class="en">' + esc(t.en) + '</span></span>'
+        + '<span class="sc">' + t.s + '</span>'
+        + '</div>').join('')
+    + '</div></div>';
+}
+
+/* ------------------------------------------------------------------ teams strip */
+const elTeams = document.getElementById('teams');
+function renderTeams(flashIdx){
+  const max = Math.max(100, ...scores);
+  const best = Math.max(...scores);
+  elTeams.innerHTML = '';
+  TEAMS.forEach((t,i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tcell' + (scores[i] === best && best > 0 ? ' lead' : '') + (flashIdx === i ? ' flash' : '');
+    b.title = (signMode === -1 ? 'Deduct ' : 'Award ') + currentPts() + ' points '
+      + (signMode === -1 ? 'from ' : 'to ') + t.en + ' (key ' + (i+1) + ')';
+    b.innerHTML = '<span class="key">' + (i+1) + '</span>'
+      + '<span class="row1"><span class="zh cjk"></span><span class="sc"></span></span>'
+      + '<span class="en"></span>'
+      + '<span class="bar"><i style="width:' + Math.round(Math.max(0,scores[i]) / max * 100) + '%"></i></span>';
+    b.querySelector('.zh').textContent = t.zh;
+    b.querySelector('.en').textContent = t.en;
+    b.querySelector('.sc').textContent = scores[i];
+    b.addEventListener('click', () => award(i));
+    elTeams.appendChild(b);
+  });
+}
+
+function currentPts(){
+  const it = DECK[idx];
+  if (!it || it.kind !== 'q') return 10;
+  /* the assist tier is worth half, rounded to the nearest 5 */
+  if (assistOn && it.assist && it.form !== 'shape') return Math.round(it.pts / 2 / 5) * 5;
+  return it.pts;
+}
+/* deduct mode: Shift on a keyboard, a sticky toggle on touch */
+let signMode = 1;
+function setSign(neg){
+  signMode = neg ? -1 : 1;
+  const b = document.getElementById('btnSign');
+  b.textContent = neg ? '− deduct' : '＋ award';
+  b.setAttribute('aria-pressed', String(neg));
+  b.classList.toggle('danger', neg);
+  document.body.classList.toggle('deduct', neg);
+  renderTeams();
+}
+function award(i, sign){
+  const s = sign === -1 ? -1 : signMode;
+  const delta = currentPts() * s;
+  scores[i] = Math.max(0, scores[i] + delta);
+  history.push({i, delta});
+  persist();
+  renderTeams(i);
+  if (DECK[idx].kind === 'final') renderFinal();
+}
+function undo(){
+  const last = history.pop();
+  if (!last) return;
+  scores[last.i] = Math.max(0, scores[last.i] - last.delta);
+  persist(); renderTeams();
+  if (DECK[idx].kind === 'final') renderFinal();
+}
+
+/* ------------------------------------------------------------------ session clock */
+const TARGET_MIN = 60;
+const elSess = document.getElementById('sess');
+let sessionStart = null;
+function paintSession(){
+  if (!sessionStart){ elSess.className = 'sess idle'; elSess.innerHTML = '00:00<i>/' + TARGET_MIN + '</i>'; return; }
+  const s = Math.floor((Date.now() - sessionStart) / 1000);
+  const mm = String(Math.floor(s / 60)).padStart(2,'0');
+  const ss = String(s % 60).padStart(2,'0');
+  elSess.className = 'sess' + (s > TARGET_MIN * 60 ? ' over' : '');
+  elSess.innerHTML = mm + ':' + ss + '<i>/' + TARGET_MIN + '</i>';
+}
+setInterval(paintSession, 1000);
+paintSession();
+
+/* ------------------------------------------------------------------ nav */
+function go(step){
+  const next = idx + step;
+  if (next < 0 || next >= DECK.length) return;
+  if (!sessionStart && next > 0) { sessionStart = Date.now(); paintSession(); }
+  idx = next; revealed = false; assistOn = false; render();
+}
+/* jump to the next round — the pacing valve when a round is running long */
+function nextRound(){
+  for (let i = idx + 1; i < DECK.length; i++){
+    if (DECK[i].kind === 'round' || DECK[i].kind === 'final'){
+      if (!sessionStart) { sessionStart = Date.now(); paintSession(); }
+      idx = i; revealed = false; assistOn = false; render();
+      return;
+    }
+  }
+}
+function toggleAssist(){
+  const it = DECK[idx];
+  if (it.kind !== 'q' || !it.assist || it.form === 'shape') return;
+  assistOn = !assistOn;
+  render();
+}
+function reveal(){
+  if (DECK[idx].kind !== 'q') return;
+  revealed = true;
+  clearInterval(tId); tId = null; paintTimer();
+  render();
+}
+
+function showStandings(){ idx = DECK.length - 1; revealed = false; assistOn = false; render(); }
+/* back to the title card — the session clock and the scores keep running */
+function goHome(){ idx = 0; revealed = false; assistOn = false; render(); }
+
+document.getElementById('btnHome').addEventListener('click', goHome);
+document.getElementById('btnHomeBtn').addEventListener('click', goHome);
+
+document.getElementById('btnNext').addEventListener('click', () => go(1));
+document.getElementById('btnPrev').addEventListener('click', () => go(-1));
+document.getElementById('btnReveal').addEventListener('click', reveal);
+document.getElementById('btnAssist').addEventListener('click', toggleAssist);
+document.getElementById('btnTimer').addEventListener('click', toggleTimer);
+document.getElementById('btnSkip').addEventListener('click', nextRound);
+document.getElementById('btnStand').addEventListener('click', showStandings);
+document.getElementById('btnUndo').addEventListener('click', undo);
+document.getElementById('btnSign').addEventListener('click', () => setSign(signMode === 1));
+document.getElementById('btnReset').addEventListener('click', () => {
+  scores = TEAMS.map(() => 0); history = []; persist(); renderTeams();
+  if (DECK[idx].kind === 'final') renderFinal();
+});
+
+const peek = document.getElementById('peek');
+const btnPeek = document.getElementById('btnPeek');
+function setPeek(on){
+  const it = DECK[idx];
+  if (on && it.kind === 'q'){
+    peek.innerHTML = 'Answer: <b>' + esc(it.a) + '</b>';
+    peek.classList.add('on');
+  } else {
+    peek.classList.remove('on');
+  }
+  btnPeek.setAttribute('aria-pressed', String(on && it.kind === 'q'));
+  btnPeek.classList.toggle('primary', !!(on && it.kind === 'q'));
+}
+btnPeek.addEventListener('click', () => setPeek(!peek.classList.contains('on')));
+
+/* swipe to change cards on touch */
+let tx = 0, ty = 0, tt = 0;
+const stageEl = document.getElementById('stage');
+stageEl.addEventListener('touchstart', e => {
+  const t = e.changedTouches[0];
+  tx = t.clientX; ty = t.clientY; tt = Date.now();
+}, {passive:true});
+stageEl.addEventListener('touchend', e => {
+  const t = e.changedTouches[0];
+  const dx = t.clientX - tx, dy = t.clientY - ty;
+  if (Date.now() - tt > 700) return;
+  if (Math.abs(dx) < 60 || Math.abs(dy) > 60) return;
+  go(dx < 0 ? 1 : -1);
+}, {passive:true});
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if (k === ' ' || k === 'ArrowRight' || k === 'PageDown'){ e.preventDefault(); go(1); return; }
+  if (k === 'ArrowLeft' || k === 'PageUp'){ e.preventDefault(); go(-1); return; }
+  if (k === 'r' || k === 'R'){ e.preventDefault(); reveal(); return; }
+  if (k === 't' || k === 'T'){ e.preventDefault(); toggleTimer(); return; }
+  if (k === 'a' || k === 'A'){ e.preventDefault(); toggleAssist(); return; }
+  if (k === 'n' || k === 'N'){ e.preventDefault(); nextRound(); return; }
+  if (k === 'Backspace'){ e.preventDefault(); undo(); return; }
+  if (k === '0'){ e.preventDefault(); showStandings(); return; }
+  if (k === 'Home'){ e.preventDefault(); goHome(); return; }
+  if (/^[1-6]$/.test(k)){ e.preventDefault(); award(+k - 1, e.shiftKey ? -1 : undefined); return; }
+  if ((k === 'h' || k === 'H') && !e.repeat){ setPeek(true); }
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'h' || e.key === 'H') setPeek(false);
+});
+window.addEventListener('blur', () => setPeek(false));
+
+renderTeams();
+render();
+</script>
+</body>
+</html>
